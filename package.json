@@ -1,0 +1,22 @@
+{
+  "name": "corebos-jitsu-destination",
+  "version": "0.0.1",
+  "description": "Jitsu destination - corebos-jitsu-destination",
+  "main": "dist/corebos-jitsu-destination.js",
+  "scripts": {
+    "clean": "rm -rf ./dist",
+    "build": "jitsu-cli extension build",
+    "test": "jitsu-cli extension test",
+    "validate-config": "jitsu-cli extension validate-config",
+    "execute": "jitsu-cli extension exec"
+  },
+  "devDependencies": {
+    "@jitsu/types": "^0.9.0",
+    "@jitsu/jlib": "^0.9.0",
+    "ts-jest": "^27.0.7",
+    "jitsu-cli": "^0.9.0",
+    "tslib": "^2.3.1",
+    "typescript": "^4.5.2"
+  },
+  "dependencies": {}
+}
