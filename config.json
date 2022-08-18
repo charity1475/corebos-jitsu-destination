@@ -1,0 +1,7 @@
+{
+    "url":"https://hooks.slack.com/services/ABC/XYZ/etc", 
+    "event_types":"registration,error",
+    "username":"admin",
+    "access_key":"pbx2www", 
+    "message_template": "Important event of type: ${event_type}"
+}
