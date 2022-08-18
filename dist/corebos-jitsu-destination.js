@@ -619,13 +619,13 @@ const validator = async (config) => {
         return "Missing required parameter: username";
     }
     try {
-        let response = await fetch(config.url, { method: 'post' });
-        let responseText = await response.text();
-        if (responseText == "invalid_payload") {
+        let response = await fetch(`${config.url}/webservice.php/getchallenge?operation=getchallenge&username=${config.username}`, { method: 'get' });
+        let response_json = await response.json();
+        if (response_json.success == true) {
             return true;
         }
         else {
-            return "Error: " + responseText;
+            return "Error: " + response_json.string();
         }
     }
     catch (error) {
@@ -661,5 +661,5 @@ exports.descriptor = descriptor;
 exports.destination = destination;
 exports.validator = validator;
 
-exports.buildInfo = {sdkVersion: "0.9.0", sdkPackage: "jitsu-cli", buildTimestamp: "2022-08-18T13:43:12.381Z"};
+exports.buildInfo = {sdkVersion: "0.9.0", sdkPackage: "jitsu-cli", buildTimestamp: "2022-08-18T14:25:45.554Z"};
 exports.streamReader$StdoutFacade = exports.streamReader && __$srcLib.stdoutStreamReader(exports.streamReader);

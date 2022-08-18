@@ -1,5 +1,6 @@
 import { DestinationFunction, DestinationMessage, JitsuDestinationContext, ConfigValidator } from "@jitsu/types/extension";
 import { DefaultJitsuEvent } from "@jitsu/types/event";
+import axios from 'axios';
 
 export type DestinationConfig = {
   instance_name:    string
@@ -31,12 +32,12 @@ export const validator: ConfigValidator<DestinationConfig> = async (config: Dest
   }
 
   try {
-    let response = await fetch(config.url, { method: 'post' });
-    let responseText = await response.text()
-    if (responseText == "invalid_payload") {
+    let response = await fetch(`${config.url}/webservice.php/getchallenge?operation=getchallenge&username=${config.username}`, { method: 'get' });
+    let response_json = await response.json()
+    if (response_json.success == true) {
       return true
     } else {
-      return "Error: " + responseText
+      return "Error: " + response_json.string();
     }
   } catch (error) {
     return "Error: " + error.toString()
