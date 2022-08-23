@@ -1,5 +1,6 @@
 import { DestinationFunction, DestinationMessage, JitsuDestinationContext, ConfigValidator } from "@jitsu/types/extension";
 import { DefaultJitsuEvent } from "@jitsu/types/event";
+import md5 from 'blueimp-md5';
 
 export type DestinationConfig = {
   instance_name: string
@@ -16,9 +17,6 @@ export const validator: ConfigValidator<DestinationConfig> = async (config: Dest
       throw new Error(`Required property '${prop}' is absent in config. Present props: ${Object.keys(config)}`);
     }
   });
-  if (!isValidUrl(config.url)) {
-    throw new Error(`Invalid url: ${config.url}`);
-  }
 
   try {
     let response = await fetch(`${config.url}/webservice.php/getchallenge?operation=getchallenge&username=${config.username}`, { method: 'get' });
@@ -34,43 +32,53 @@ export const validator: ConfigValidator<DestinationConfig> = async (config: Dest
 }
 
 export const destination: DestinationFunction = (event: DefaultJitsuEvent, dstContext: JitsuDestinationContext<DestinationConfig>) => {
-  const eventTypes = dstContext.config.event_types.split(",")
-  if (!eventTypes.includes(event.event_type)) {
-    return null
+  let config = dstContext.config;
+  let sessionName = login(config);
+  if (sessionName == null) {
+    return;
   }
-  let messageText = renderTemplateMessage(dstContext.config.message_template, event)
-  if (!messageText) {
-    return null;
+  
+
+  function getEventType($) {
+    switch ($.event_type) {
+      case "notification":
+      case "identify":
+        return "$identify";
+      case "page":
+      case "pageview":
+      case "site_page":
+        return "Page View";
+      default:
+        return $.event_type;
+    }
   }
 
+  const eventType = getEventType(event);
+  let envelops: DestinationMessage[] = [];
 
+  if (eventType == "$identify") {
+    envelops.push({
+      url: "https://demo.corebos.com/webservice.php/webservice.php/getchallenge?operation=getchallenge&username=admin",
+      method: "GET",
+      body: {}
+    });
 
-
-  const context = event.eventn_ctx || event;
-  const user = context.user || {};
-  const utm = context.utm || {};
-  const location = context.location || {};
-  const ua = context.parsed_ua || {};
-  const conversion = context.conversion || {};
-  const matches = context.referer?.match(
-    /^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i
-  );
-  const refDomain = matches && matches[1];
-  const config = dstContext.config
-  const Authorization = `<TOKEN>`;
-
-  //TODO: filter events by config.event_types
-  function getTypes(event: DefaultJitsuEvent) {
-    return event.type;
   }
-  //TODO: send each to a specific endpoint 
-  return { url: "https://test.com", method: "POST", body: { a: (event.a || 0) + 1 } };
+  if(eventType == "Page View") {
+    envelops.push({
+      url: "https://demo.corebos.com/webservice.php/webservice.php/getchallenge?operation=getchallenge&username=admin",
+      method: "POST",
+      body: JSON.stringify([{
+        event: "$site_page",
+        properties: {
 
-
-
-};
-export const notification: DestinationFunction = (event: DefaultJitsuEvent, dstContext: JitsuDestinationContext<DestinationConfig>) => {
-  return { url: "https://test.com", method: "POST", body: { a: (event.a || 0) + 1 } };
+        }
+      }
+      ])
+    });
+  }
+  return envelops;
+  // return { url: `${dstContext.config.url}/webservice.php/getchallenge?operation=getchallenge&username=${dstContext.config.username}`, method: "GET", body: { a: (event.a || 0) + 1 } };
 };
 
 const isValidUrl = urlString => {
@@ -83,19 +91,15 @@ const isValidUrl = urlString => {
 
   return !!urlPattern.test(urlString);
 }
-function renderTemplateMessage(str, obj) {
-  const get = (obj: any, key: string | string[]) => {
-    if (typeof key == 'string')
-      key = key.split('.');
 
-    if (key.length == 1)
-      return obj[key[0]];
-    else if (key.length == 0)
-      return obj;
-    else
-      return get(obj[key[0]], key.slice(1));
+const login = async (config: DestinationConfig) => {
+  let response = await fetch(`${config.url}/webservice.php/getchallenge?operation=getchallenge&username=${config.username}`, { method: 'get' });
+  let response_json = await response.json()
+  if (response_json.success == true) {
+    var login_response = await fetch(`${config.url}/webservice.php/login?operation=login&username=${config.username}&accesskey=${md5(response_json.result.token + config.access_key)}`, { method: 'post' });
+    let result = await login_response.json();
+    return result.result.sessionName;
+  } else {
+    return null;
   }
-  return str.replace(/\$\{(.+)\}/g, (match, p1) => {
-    return get(obj, p1)
-  })
 }
