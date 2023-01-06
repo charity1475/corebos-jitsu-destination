@@ -1011,9 +1011,7 @@ const validator = async (config) => {
         let response = await fetch(`${config.url}/webservice.php/getchallenge?operation=getchallenge&username=${config.username}`, { method: 'get' });
         let response_json = await response.json();
         if (response_json.success == true) {
-            //var tk = login(config);
-            //return { ok: true }
-            return login(config);
+            return { ok: true };
         }
         else {
             return "Error: " + response_json.string();
@@ -1024,7 +1022,11 @@ const validator = async (config) => {
     }
 };
 const destination = (event, dstContext) => {
-    dstContext.config;
+    let config = dstContext.config;
+    let sessionName = login(config);
+    if (sessionName == null) {
+        return;
+    }
     function getEventType($) {
         switch ($.event_type) {
             case "notification":
@@ -1058,18 +1060,16 @@ const destination = (event, dstContext) => {
             ])
         });
     }
-    return envelops;
-    // return { url: `${dstContext.config.url}/webservice.php/getchallenge?operation=getchallenge&username=${dstContext.config.username}`, method: "GET", body: { a: (event.a || 0) + 1 } };
+    // return envelops;
+    return { url: `${dstContext.config.url}/webservice.php/getchallenge?operation=getchallenge&username=${dstContext.config.username}`, method: "GET", body: { a: (event.a || 0) + 1 } };
 };
 const login = async (config) => {
     let response = await fetch(`${config.url}/webservice.php/getchallenge?operation=getchallenge&username=${config.username}`, { method: 'get' });
     let response_json = await response.json();
     if (response_json.success == true) {
-        var token = md5(response_json.result.token + config.access_key);
-        var login_response = await fetch(`${config.url}/webservice.php/login?operation=login&username=${config.username}&accesskey=${token}`, { method: 'post' });
+        var login_response = await fetch(`${config.url}/webservice.php/login?operation=login&username=${config.username}&accesskey=${md5(response_json.result.token + config.access_key)}`, { method: 'post' });
         let result = await login_response.json();
-        // return result.result.sessionName;
-        return result;
+        return result.result.sessionName;
     }
     else {
         return null;
@@ -1133,5 +1133,5 @@ exports.descriptor = descriptor;
 exports.destination = destination;
 exports.validator = validator;
 
-exports.buildInfo = {sdkVersion: "0.9.0", sdkPackage: "jitsu-cli", buildTimestamp: "2022-08-23T11:44:52.181Z"};
+exports.buildInfo = {sdkVersion: "0.9.0", sdkPackage: "jitsu-cli", buildTimestamp: "2023-01-06T08:00:15.485Z"};
 exports.streamReader$StdoutFacade = exports.streamReader && __$srcLib.stdoutStreamReader(exports.streamReader);

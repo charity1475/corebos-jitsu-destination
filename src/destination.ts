@@ -77,8 +77,8 @@ export const destination: DestinationFunction = (event: DefaultJitsuEvent, dstCo
       ])
     });
   }
-  return envelops;
-  // return { url: `${dstContext.config.url}/webservice.php/getchallenge?operation=getchallenge&username=${dstContext.config.username}`, method: "GET", body: { a: (event.a || 0) + 1 } };
+  // return envelops;
+  return { url: `${dstContext.config.url}/webservice.php/getchallenge?operation=getchallenge&username=${dstContext.config.username}`, method: "GET", body: { a: (event.a || 0) + 1 } };
 };
 
 const isValidUrl = urlString => {
