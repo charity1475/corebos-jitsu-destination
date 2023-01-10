@@ -1,0 +1,9 @@
+{
+  "url": "https://demo.corebos.com",
+  "event_types": "registration,error,comment",
+  "username": "admin",
+  "access_key": "cdYTBpiMR9RfGgO",
+  "instance_name": "corebos",
+  "faq_id": "3x4681",
+  "comment": "A sample comment of event type: ${event_type}"
+}

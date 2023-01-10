@@ -1,5 +1,7 @@
-import { ExtensionDescriptor } from "@jitsu/types/extension";
-import { destination, validator, DestinationConfig } from "./destination";
+import {ConfigValidator, DestinationFunction, ExtensionDescriptor} from "@jitsu/types/extension";
+import { coreBOSDestinationFunction, validator} from "./destination";
+
+const destination: DestinationFunction = coreBOSDestinationFunction;
 
 const descriptor: ExtensionDescriptor = {
   id: "corebos-jitsu-destination",
