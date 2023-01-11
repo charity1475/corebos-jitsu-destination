@@ -1,6 +1,6 @@
 {
   "name": "corebos-jitsu-destination",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Jitsu destination - corebos-jitsu-destination",
   "main": "dist/corebos-jitsu-destination.js",
   "scripts": {

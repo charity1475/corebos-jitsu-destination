@@ -1,8 +1,0 @@
-{
-  "url": "https://demo.corebos.com",
-  "event_types": "registration,error",
-  "username": "admin",
-  "access_key": "pbx2www",
-  "instance_name": "corebos",
-  "message_template": "Important event of type: ${event_type}"
-}
