@@ -43,10 +43,6 @@ export const coreBOSDestinationFunction: DestinationFunction = (
   dstContext: JitsuDestinationContext<DestinationConfig>
 ) => {
   let config = dstContext.config;
-  // let sessionName = login(config);
-  // if (sessionName == null) {
-  //   return;
-  // }
 
   function getEventType($) {
     switch ($.event_type) {
@@ -94,22 +90,3 @@ const isValidUrl = (urlString) => {
 
   return !!urlPattern.test(urlString);
 };
-
-// const login = async (config: DestinationConfig) => {
-//   let response = await fetch(
-//     `${config.url}/webservice.php/getchallenge?operation=getchallenge&username=${config.username}`,
-//     { method: "get" }
-//   );
-//   let response_json = await response.json();
-//   if (response_json.success == true) {
-//     var login_response = await fetch(
-//       `${config.url}/webservice.php/login?operation=login&username=${config.username
-//       }&accesskey=${md5(response_json.result.token + config.access_key)}`,
-//       { method: "post" }
-//     );
-//     let result = await login_response.json();
-//     return result.result.sessionName;
-//   } else {
-//     return null;
-//   }
-// };
